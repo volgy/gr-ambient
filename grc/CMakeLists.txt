@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    ambient_pwm_decoder.xml DESTINATION share/gnuradio/grc/blocks
+    ambient_pwm_decoder.xml
+    ambient_manchester_decoder.xml DESTINATION share/gnuradio/grc/blocks
 )

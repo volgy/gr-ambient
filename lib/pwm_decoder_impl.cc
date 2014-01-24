@@ -68,6 +68,7 @@ namespace gr {
         for (int i = 0; i < noutput_items; i++) {
           if (state == 0) {
             if (in[i] > threshold) {
+              std::cout << "L[" << width << "] ";
               width = 1;
               state = 1;
             }
@@ -77,12 +78,12 @@ namespace gr {
           }
           else {
             if (in[i] < threshold) {
-              //std::cout << "[" << width << "]";
+              std::cout << "H[" << width << "] ";
               if (width >= zero_min && width <= zero_max) {
-                std::cout << "0 ";
+                //std::cout << "0";
               }
               if (width >= one_min && width <= one_max) {
-                std::cout << "1 ";
+                //std::cout << "1";
               }
               width = 1;
               state = 0;

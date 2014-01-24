@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    pwm_decoder.h DESTINATION include/ambient
+    pwm_decoder.h
+    manchester_decoder.h DESTINATION include/ambient
 )

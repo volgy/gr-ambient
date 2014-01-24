@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<block>
+  <name>manchester_decoder</name>
+  <key>ambient_manchester_decoder</key>
+  <category>Ambient Weather</category>
+  <import>import ambient</import>
+  <make>ambient.manchester_decoder($samples_per_bit)</make>
+
+  <param>
+    <name>Samples per bit</name>
+    <key>samples_per_bit</key>
+    <type>int</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>float</type>
+  </sink>
+</block>

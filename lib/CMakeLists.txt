@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND ambient_sources
     pwm_decoder_impl.cc
+    manchester_decoder_impl.cc
 )
 
 add_library(gnuradio-ambient SHARED ${ambient_sources})
