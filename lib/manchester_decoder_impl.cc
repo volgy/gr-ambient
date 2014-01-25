@@ -1,4 +1,4 @@
-/* -*- c++ -*- */
+  /* -*- c++ -*- */
 /* 
  * Copyright 2014 <+YOU OR YOUR COMPANY+>.
  * 
@@ -22,9 +22,17 @@
 #include "config.h"
 #endif
 
+#include <ctime>
 #include <gnuradio/io_signature.h>
 #include "manchester_decoder_impl.h"
 
+std::string now( const char* format = "%c" )
+{
+    std::time_t t = std::time(0);
+    char cstr[128];
+    std::strftime( cstr, sizeof(cstr), format, std::localtime(&t) );
+    return cstr;
+}
 namespace gr {
   namespace ambient {
 
@@ -44,6 +52,8 @@ namespace gr {
               gr::io_signature::make(0, 0, 0)),
       samples_per_bit(smps_per_bit ), state(IDLE), pulse_cnt(0), prev_sample(0)
     {
+          spb_short_pulse = round(0.7 * samples_per_bit);
+          spb_long_pulse = round(1.2 * samples_per_bit);
     }
 
     /*
@@ -53,40 +63,57 @@ namespace gr {
     {
     }
 
+
     int
     manchester_decoder_impl::work(int noutput_items,
 			  gr_vector_const_void_star &input_items,
 			  gr_vector_void_star &output_items)
     {
         const float *in = (const float *) input_items[0];
-
         for (int i = 0; i < noutput_items; i++) {
-          bool change = abs(in[i] - prev_sample) > 0.5; // TODO: presuming threshold block
+          bool change = fabs(in[i] - prev_sample) > 0.5; // TODO: presuming threshold block
           prev_sample = in[i];
 
           if (change) {
             switch (state) {
               case IDLE:
-                if (change) {
-                  std::cout << "manchester_decoder: change w=" << pulse_cnt << std::endl;
-                  pulse_cnt = 0;
-                }
+                std::cout << "manchester_decoder: SOF " << now() << std::endl;
+                bit_cnt = 0;
+                state = CLOCK;
                 break;
               case CLOCK:
+                if (pulse_cnt > spb_short_pulse) {
+                  std::cout << "manchester_decoder: clock recovery error, dropping frame" << std::endl;
+                  state = IDLE;
+                }
+                else {
+                  state = DATA;
+                }
                 break;
               case DATA:
+                if (pulse_cnt > spb_short_pulse) {
+                  std::cout << "1 ";
+                  bit_cnt++;
+                  state = DATA;
+                }
+                else {
+                  std::cout << "0 ";
+                  bit_cnt++;
+                  state = CLOCK;
+                }
                 break;
             }
             pulse_cnt = 0;
           }
 
-          if (pulse_cnt > (2*samples_per_bit)) {  // safety margin
-            state = IDLE;
-            std::cout << "manchester_decoder: timeout (end of packet)" << std::endl;
-          }
-
           if (state != IDLE) {
             pulse_cnt++;
+            if (pulse_cnt > spb_long_pulse) { 
+              state = IDLE;
+              std::cout << std::endl << "manchester_decoder: timeout (EOF) " \
+                << (state == DATA ? "data" : "clock") \
+                << " " << bit_cnt << std::endl;
+            }
           }
           
         }

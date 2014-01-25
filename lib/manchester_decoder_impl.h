@@ -33,6 +33,10 @@ namespace gr {
       enum State { IDLE, DATA, CLOCK };
 
       int samples_per_bit;
+      int spb_short_pulse;
+      int spb_long_pulse;
+      int bit_cnt;
+
       int pulse_cnt;
       float prev_sample;
       State state;

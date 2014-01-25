@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Sat Jan 25 15:04:11 2014</timestamp>
+  <timestamp>Sat Jan 25 15:29:31 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -64,7 +64,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>samp_rate</value>
+      <value>baud</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -72,11 +72,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>1e6</value>
+      <value>1000</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(11, 170)</value>
+      <value>(89, 98)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -110,7 +110,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>baud</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -118,11 +118,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>1000</value>
+      <value>1e6</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(89, 98)</value>
+      <value>(11, 170)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -165,49 +165,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_wavfile_source</key>
-    <param>
-      <key>id</key>
-      <value>blocks_wavfile_source_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>filename</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>nchan</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(189, 279)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>ambient_manchester_decoder</key>
     <param>
       <key>id</key>
@@ -228,6 +185,45 @@
     <param>
       <key>_coordinate</key>
       <value>(413, 286)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_wavfile_source</key>
+    <param>
+      <key>id</key>
+      <value>blocks_wavfile_source_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>filename</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>nchan</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(189, 279)</value>
     </param>
     <param>
       <key>_rotation</key>
