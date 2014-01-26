@@ -19,5 +19,6 @@
 
 install(FILES
     ambient_pwm_decoder.xml
-    ambient_manchester_decoder.xml DESTINATION share/gnuradio/grc/blocks
+    ambient_manchester_decoder.xml
+    ambient_packet_squelch.xml DESTINATION share/gnuradio/grc/blocks
 )

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<block>
+  <name>packet_squelch</name>
+  <key>ambient_packet_squelch</key>
+  <category>Ambient Weather</category>
+  <import>import ambient</import>
+  <make>ambient.packet_squelch($samples_per_bit)</make>
+  
+  <param>
+    <name>Samples per bit</name>
+    <key>samples_per_bit</key>
+    <type>int</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>float</type>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>float</type>
+  </source>
+</block>

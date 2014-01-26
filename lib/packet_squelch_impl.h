@@ -18,44 +18,41 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_AMBIENT_MANCHESTER_DECODER_IMPL_H
-#define INCLUDED_AMBIENT_MANCHESTER_DECODER_IMPL_H
+#ifndef INCLUDED_AMBIENT_PACKET_SQUELCH_IMPL_H
+#define INCLUDED_AMBIENT_PACKET_SQUELCH_IMPL_H
 
-#include <ambient/manchester_decoder.h>
+#include <ambient/packet_squelch.h>
 
 namespace gr {
   namespace ambient {
 
-    class manchester_decoder_impl : public manchester_decoder
+    class packet_squelch_impl : public packet_squelch
     {
      private:
-
-      enum State { IDLE, DATA, CLOCK };
-
+      enum State { IDLE, FRAME };
+      State state;
       int samples_per_bit;
-      int spb_short_pulse;
       int spb_long_pulse;
-      int bit_cnt;
-
       int pulse_cnt;
       float prev_sample;
-      State state;
 
       std::string now( const char* format = "%c" );
-      void emit_bit(int bit);
 
      public:
-      manchester_decoder_impl(int samples_per_bit);
-      ~manchester_decoder_impl();
+      packet_squelch_impl(int samples_per_bit);
+      ~packet_squelch_impl();
 
       // Where all the action really happens
-      int work(int noutput_items,
-	       gr_vector_const_void_star &input_items,
-	       gr_vector_void_star &output_items);
+      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+
+      int general_work(int noutput_items,
+		       gr_vector_int &ninput_items,
+		       gr_vector_const_void_star &input_items,
+		       gr_vector_void_star &output_items);
     };
 
   } // namespace ambient
 } // namespace gr
 
-#endif /* INCLUDED_AMBIENT_MANCHESTER_DECODER_IMPL_H */
+#endif /* INCLUDED_AMBIENT_PACKET_SQUELCH_IMPL_H */
 

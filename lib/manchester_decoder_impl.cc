@@ -26,13 +26,9 @@
 #include <gnuradio/io_signature.h>
 #include "manchester_decoder_impl.h"
 
-std::string now( const char* format = "%c" )
-{
-    std::time_t t = std::time(0);
-    char cstr[128];
-    std::strftime( cstr, sizeof(cstr), format, std::localtime(&t) );
-    return cstr;
-}
+//#define DIFFERENTIAL
+
+
 namespace gr {
   namespace ambient {
 
@@ -63,6 +59,7 @@ namespace gr {
     {
     }
 
+#ifdef DIFFERENTIAL
 
     int
     manchester_decoder_impl::work(int noutput_items,
@@ -77,8 +74,10 @@ namespace gr {
           if (change) {
             switch (state) {
               case IDLE:
-                std::cout << "manchester_decoder: SOF " << now() << std::endl;
+                //std::cout << "manchester_decoder: SOF " << now() << std::endl;
+                std::cout << now("%D %T") << "> ";
                 bit_cnt = 0;
+                emit_bit(0);
                 state = CLOCK;
                 break;
               case CLOCK:
@@ -92,13 +91,11 @@ namespace gr {
                 break;
               case DATA:
                 if (pulse_cnt > spb_short_pulse) {
-                  std::cout << "1 ";
-                  bit_cnt++;
+                  emit_bit(1);
                   state = DATA;
                 }
                 else {
-                  std::cout << "0 ";
-                  bit_cnt++;
+                  emit_bit(0);
                   state = CLOCK;
                 }
                 break;
@@ -110,16 +107,86 @@ namespace gr {
             pulse_cnt++;
             if (pulse_cnt > spb_long_pulse) { 
               state = IDLE;
+              /*
               std::cout << std::endl << "manchester_decoder: timeout (EOF) " \
                 << (state == DATA ? "data" : "clock") \
                 << " " << bit_cnt << std::endl;
+              */
+              std::cout << " (len=" << bit_cnt << ")" << std::endl;
             }
           }
           
         }
-        // Tell runtime system how many output items we produced.
         return noutput_items;
     }
+
+#else // NON-DIFFERENTIAL
+
+    int
+    manchester_decoder_impl::work(int noutput_items,
+        gr_vector_const_void_star &input_items,
+        gr_vector_void_star &output_items)
+    {
+        const float *in = (const float *) input_items[0];
+        for (int i = 0; i < noutput_items; i++) {
+          bool edge_lh = (in[i] - prev_sample) > 0.5; // TODO: presuming threshold block
+          bool edge_hl = (prev_sample - in[i]) > 0.5; // TODO: presuming threshold block
+          bool edge = edge_lh || edge_hl; 
+          prev_sample = in[i];
+
+          if (edge) {
+            switch (state) {
+              case IDLE:
+                //std::cout << "manchester_decoder: SOF " << now() << std::endl;
+                std::cout << now("%D %T") << "> ";
+                bit_cnt = 0;
+                pulse_cnt = round(0.5 * samples_per_bit);
+                //pulse_cnt = 0; emit_bit(edge_lh ? 1 : 0);  // TODO: configurable polarity
+                state = DATA;
+                break;
+              case DATA:
+                if (pulse_cnt > spb_short_pulse) {
+                  emit_bit(edge_lh ? 1 : 0);  // TODO: configurable polarity
+                  pulse_cnt = 0;
+                }
+                break;
+            }
+          }
+
+          if (state != IDLE) {
+            pulse_cnt++;
+            if (pulse_cnt > spb_long_pulse) { 
+              state = IDLE;
+              /*
+              std::cout << std::endl << "manchester_decoder: timeout (EOF) " \
+                << (state == DATA ? "data" : "clock") \
+                << " " << bit_cnt << std::endl;
+              */
+              std::cout << " (len=" << bit_cnt << ")" << std::endl;
+            }
+          }
+          
+        }
+        return noutput_items;
+    }
+
+#endif  // DIFFERENTIAL vs. NON-DIFFERENTIAL
+
+    std::string manchester_decoder_impl::now( const char* format)
+    {
+        std::time_t t = std::time(0);
+        char cstr[128];
+        std::strftime( cstr, sizeof(cstr), format, std::localtime(&t) );
+        return cstr;
+    }
+
+    void manchester_decoder_impl::emit_bit(int bit) 
+    {
+      std::cout << (bit ? "1" : "0");
+      if ( ((++bit_cnt) % 4) == 0 ) {
+        std::cout << " ";
+      }
+    } 
 
   } /* namespace ambient */
 } /* namespace gr */

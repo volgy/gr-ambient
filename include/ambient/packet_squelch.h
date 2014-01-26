@@ -18,44 +18,39 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_AMBIENT_MANCHESTER_DECODER_IMPL_H
-#define INCLUDED_AMBIENT_MANCHESTER_DECODER_IMPL_H
 
-#include <ambient/manchester_decoder.h>
+#ifndef INCLUDED_AMBIENT_PACKET_SQUELCH_H
+#define INCLUDED_AMBIENT_PACKET_SQUELCH_H
+
+#include <ambient/api.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace ambient {
 
-    class manchester_decoder_impl : public manchester_decoder
+    /*!
+     * \brief <+description of block+>
+     * \ingroup ambient
+     *
+     */
+    class AMBIENT_API packet_squelch : virtual public gr::block
     {
-     private:
-
-      enum State { IDLE, DATA, CLOCK };
-
-      int samples_per_bit;
-      int spb_short_pulse;
-      int spb_long_pulse;
-      int bit_cnt;
-
-      int pulse_cnt;
-      float prev_sample;
-      State state;
-
-      std::string now( const char* format = "%c" );
-      void emit_bit(int bit);
-
      public:
-      manchester_decoder_impl(int samples_per_bit);
-      ~manchester_decoder_impl();
+      typedef boost::shared_ptr<packet_squelch> sptr;
 
-      // Where all the action really happens
-      int work(int noutput_items,
-	       gr_vector_const_void_star &input_items,
-	       gr_vector_void_star &output_items);
+      /*!
+       * \brief Return a shared_ptr to a new instance of ambient::packet_squelch.
+       *
+       * To avoid accidental use of raw pointers, ambient::packet_squelch's
+       * constructor is in a private implementation
+       * class. ambient::packet_squelch::make is the public interface for
+       * creating new instances.
+       */
+      static sptr make(int samples_per_bit);
     };
 
   } // namespace ambient
 } // namespace gr
 
-#endif /* INCLUDED_AMBIENT_MANCHESTER_DECODER_IMPL_H */
+#endif /* INCLUDED_AMBIENT_PACKET_SQUELCH_H */
 
