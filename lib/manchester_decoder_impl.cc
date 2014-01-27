@@ -26,8 +26,8 @@
 #include <gnuradio/io_signature.h>
 #include "manchester_decoder_impl.h"
 
-// #define DIFFERENTIAL
-
+//#define PRINT_BITS
+#define PRINT_MEASUREMENT
 
 namespace gr {
   namespace ambient {
@@ -46,7 +46,8 @@ namespace gr {
       : gr::sync_block("manchester_decoder",
               gr::io_signature::make(1, 1, sizeof(float)),
               gr::io_signature::make(0, 0, 0)),
-      samples_per_bit(smps_per_bit ), state(IDLE), pulse_cnt(0), prev_sample(0)
+      samples_per_bit(smps_per_bit ), state(IDLE), pulse_width(0), 
+      prev_sample(0), frame_len(0), frame_ts("")
     {
           spb_short_pulse = round(0.7 * samples_per_bit);
           spb_long_pulse = round(1.2 * samples_per_bit);
@@ -58,69 +59,6 @@ namespace gr {
     manchester_decoder_impl::~manchester_decoder_impl()
     {
     }
-
-#ifdef DIFFERENTIAL
-
-    int
-    manchester_decoder_impl::work(int noutput_items,
-			  gr_vector_const_void_star &input_items,
-			  gr_vector_void_star &output_items)
-    {
-        const float *in = (const float *) input_items[0];
-        for (int i = 0; i < noutput_items; i++) {
-          bool change = fabs(in[i] - prev_sample) > 0.5; // TODO: presuming threshold block
-          prev_sample = in[i];
-
-          if (change) {
-            switch (state) {
-              case IDLE:
-                //std::cout << "manchester_decoder: SOF " << now() << std::endl;
-                std::cout << now("%D %T") << "> ";
-                bit_cnt = 0;
-                emit_bit(1);
-                state = CLOCK;
-                break;
-              case CLOCK:
-                if (pulse_cnt > spb_short_pulse) {
-                  std::cout << "manchester_decoder: clock recovery error, dropping frame" << std::endl;
-                  state = IDLE;
-                }
-                else {
-                  state = DATA;
-                }
-                break;
-              case DATA:
-                if (pulse_cnt > spb_short_pulse) {
-                  emit_bit(0);
-                  state = DATA;
-                }
-                else {
-                  emit_bit(1);
-                  state = CLOCK;
-                }
-                break;
-            }
-            pulse_cnt = 0;
-          }
-
-          if (state != IDLE) {
-            pulse_cnt++;
-            if (pulse_cnt > spb_long_pulse) { 
-              state = IDLE;
-              /*
-              std::cout << std::endl << "manchester_decoder: timeout (EOF) " \
-                << (state == DATA ? "data" : "clock") \
-                << " " << bit_cnt << std::endl;
-              */
-              std::cout << " (len=" << bit_cnt << ")" << std::endl;
-            }
-          }
-          
-        }
-        return noutput_items;
-    }
-
-#else // NON-DIFFERENTIAL
 
     int
     manchester_decoder_impl::work(int noutput_items,
@@ -137,39 +75,32 @@ namespace gr {
           if (edge) {
             switch (state) {
               case IDLE:
-                //std::cout << "manchester_decoder: SOF " << now() << std::endl;
-                std::cout << now("%D %T") << "> ";
-                bit_cnt = 0;
-                pulse_cnt = round(0.5 * samples_per_bit); // this is a clock edge, preparing for '1'
-                state = DATA;
+                frame_ts = now("%D %T");
+                frame_len = 0;
+                pulse_width = round(0.5 * samples_per_bit); // this is a clock edge, preparing for '1'
+                state = FRAME;
                 break;
-              case DATA:
-                if (pulse_cnt > spb_short_pulse) {
-                  emit_bit(edge_hl ? 1 : 0);  // TODO: configurable polarity
-                  pulse_cnt = 0;
+              case FRAME:
+                if (pulse_width > spb_short_pulse) {
+                  frame[frame_len++] = edge_hl;
+                  pulse_width = 0;
                 }
                 break;
             }
           }
 
           if (state != IDLE) {
-            pulse_cnt++;
-            if (pulse_cnt > spb_long_pulse) { 
+            pulse_width++;
+            if (pulse_width > spb_long_pulse) { 
               state = IDLE;
-              /*
-              std::cout << std::endl << "manchester_decoder: timeout (EOF) " \
-                << (state == DATA ? "data" : "clock") \
-                << " " << bit_cnt << std::endl;
-              */
-              std::cout << " (len=" << bit_cnt << ")" << std::endl;
+              dump_bits();
+              // dump_measurement();
             }
           }
           
         }
         return noutput_items;
     }
-
-#endif  // DIFFERENTIAL vs. NON-DIFFERENTIAL
 
     std::string manchester_decoder_impl::now( const char* format)
     {
@@ -179,13 +110,14 @@ namespace gr {
         return cstr;
     }
 
-    void manchester_decoder_impl::emit_bit(int bit) 
+    void manchester_decoder_impl::dump_bits()
     {
-      std::cout << (bit ? "1" : "0");
-      if ( ((++bit_cnt) % 4) == 0 ) {
-        //std::cout << " ";
+      std::cout << frame_ts << "> ";
+      for (int i = 0; i < frame_len; i++) {
+        std::cout << (frame[i] ? "1" : "0");
       }
-    } 
+      std::cout << "(len=" << frame_len << ")" << std::endl;
+    }
 
   } /* namespace ambient */
 } /* namespace gr */

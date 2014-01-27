@@ -30,19 +30,22 @@ namespace gr {
     {
      private:
 
-      enum State { IDLE, DATA, CLOCK };
+      enum State { IDLE, FRAME };
 
       int samples_per_bit;
       int spb_short_pulse;
       int spb_long_pulse;
-      int bit_cnt;
 
-      int pulse_cnt;
+      int pulse_width;
       float prev_sample;
       State state;
 
+      bool frame[512];  // Valid frames are 195 bits
+      int frame_len;
+      std::string frame_ts;
+
       std::string now( const char* format = "%c" );
-      void emit_bit(int bit);
+      void dump_bits();
 
      public:
       manchester_decoder_impl(int samples_per_bit);
