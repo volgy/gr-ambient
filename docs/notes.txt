@@ -1,3 +1,5 @@
+Ambient Weather F007TH Wireless Thermo-Hygrometer (for WS-07, WS-08, WS-10 Weather Stations)
+
 Manchester encoding ('1': H->L transition)
 Bit time: 1ms
 Each packet (65bits) is repeated 3 times (back-to-back) => 195 bits frame
