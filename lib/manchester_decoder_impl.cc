@@ -23,8 +23,11 @@
 #endif
 
 #include <ctime>
+#include <boost/format.hpp>
 #include <gnuradio/io_signature.h>
 #include "manchester_decoder_impl.h"
+
+ #define min(a,b) ( (a)<(b) ? (a) : (b))
 
 //#define PRINT_BITS
 #define PRINT_MEASUREMENT
@@ -82,7 +85,8 @@ namespace gr {
                 break;
               case FRAME:
                 if (pulse_width > spb_short_pulse) {
-                  frame[frame_len++] = edge_hl;
+                  frame[frame_len] = edge_hl;
+                  frame_len = min(frame_len + 1, sizeof(frame)); // inc w/ overflow protection
                   pulse_width = 0;
                 }
                 break;
@@ -93,8 +97,10 @@ namespace gr {
             pulse_width++;
             if (pulse_width > spb_long_pulse) { 
               state = IDLE;
-              dump_bits();
-              // dump_measurement();
+              if (frame_len > 0) {  // Filter turn-on transients
+                //dump_bits();
+                dump_measurement();
+              }
             }
           }
           
@@ -117,6 +123,58 @@ namespace gr {
         std::cout << (frame[i] ? "1" : "0");
       }
       std::cout << "(len=" << frame_len << ")" << std::endl;
+      std::cout << std::flush;
+    }
+
+    int manchester_decoder_impl::slice(int from, int len)
+    {
+      int val = 0;
+
+      if (from < 0 || (from + len) >= sizeof(frame)) {
+        return -1;
+      }
+      while (len--) {
+        val = (val << 1) + frame[from++];
+      } 
+
+      return val;
+    }
+
+    // TODO: eventually this should be a separate block
+    //       does not belong to this level (Manchester decoding)
+    void manchester_decoder_impl::dump_measurement()
+    {
+      const int AMBIENT_FRAME_LEN = 195;
+      const int AMBIENT_PACKET_LEN = 65;
+
+      std::cout << frame_ts << "> ";
+
+      if (frame_len != AMBIENT_FRAME_LEN) {
+        std::cout << "ERROR: invalid frame length (" << frame_len << ")" << std::endl;
+        return;
+      }
+
+      // Each packet is repeated 3 times
+      for (int i = 0; i < AMBIENT_PACKET_LEN; i++) {
+        if ((frame[i] != frame[i+AMBIENT_PACKET_LEN]) ||
+            (frame[i] != frame[i+2*AMBIENT_PACKET_LEN])) {
+          
+          std::cout << "ERROR: invalid frame (mismatch)" << std::endl;
+        }
+      }
+
+      int r = slice(22, 8);
+      int c = slice(30, 3); 
+      int t = slice(34, 12);
+      int h = slice(46, 8);
+
+      int channel = c + 1;
+      float temp = t/20.0-40;
+      int humidity = h/2;
+
+      std::cout << boost::format("CH%d [%d] Temp=%3.1fF RH=%2d%%\n") \\
+                                  % channel % r % temp % humidity;
+      std::cout << std::flush;
     }
 
   } /* namespace ambient */

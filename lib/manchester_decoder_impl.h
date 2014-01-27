@@ -45,7 +45,9 @@ namespace gr {
       std::string frame_ts;
 
       std::string now( const char* format = "%c" );
+      int slice(int from, int len);
       void dump_bits();
+      void dump_measurement();
 
      public:
       manchester_decoder_impl(int samples_per_bit);
