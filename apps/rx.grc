@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Sun Jan 26 13:23:52 2014</timestamp>
+  <timestamp>Sun Jan 26 17:30:56 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -64,7 +64,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>freq</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -72,34 +72,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>433.92e6</value>
+      <value>1e6</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(131, 180)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>id</key>
-      <value>decim</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(8, 99)</value>
+      <value>(11, 170)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -133,7 +110,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>samp_rate</value>
+      <value>decim</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -141,11 +118,34 @@
     </param>
     <param>
       <key>value</key>
-      <value>1e6</value>
+      <value>10</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(11, 170)</value>
+      <value>(8, 99)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>id</key>
+      <value>freq</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>433.92e6</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(131, 180)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -450,7 +450,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(36, 370)</value>
+      <value>(42, 370)</value>
     </param>
     <param>
       <key>_rotation</key>

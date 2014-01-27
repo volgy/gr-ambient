@@ -26,7 +26,7 @@
 #include <gnuradio/io_signature.h>
 #include "manchester_decoder_impl.h"
 
-//#define DIFFERENTIAL
+// #define DIFFERENTIAL
 
 
 namespace gr {
@@ -77,7 +77,7 @@ namespace gr {
                 //std::cout << "manchester_decoder: SOF " << now() << std::endl;
                 std::cout << now("%D %T") << "> ";
                 bit_cnt = 0;
-                emit_bit(0);
+                emit_bit(1);
                 state = CLOCK;
                 break;
               case CLOCK:
@@ -91,11 +91,11 @@ namespace gr {
                 break;
               case DATA:
                 if (pulse_cnt > spb_short_pulse) {
-                  emit_bit(1);
+                  emit_bit(0);
                   state = DATA;
                 }
                 else {
-                  emit_bit(0);
+                  emit_bit(1);
                   state = CLOCK;
                 }
                 break;
@@ -140,13 +140,12 @@ namespace gr {
                 //std::cout << "manchester_decoder: SOF " << now() << std::endl;
                 std::cout << now("%D %T") << "> ";
                 bit_cnt = 0;
-                pulse_cnt = round(0.5 * samples_per_bit);
-                //pulse_cnt = 0; emit_bit(edge_lh ? 1 : 0);  // TODO: configurable polarity
+                pulse_cnt = round(0.5 * samples_per_bit); // this is a clock edge, preparing for '1'
                 state = DATA;
                 break;
               case DATA:
                 if (pulse_cnt > spb_short_pulse) {
-                  emit_bit(edge_lh ? 1 : 0);  // TODO: configurable polarity
+                  emit_bit(edge_hl ? 1 : 0);  // TODO: configurable polarity
                   pulse_cnt = 0;
                 }
                 break;
@@ -184,7 +183,7 @@ namespace gr {
     {
       std::cout << (bit ? "1" : "0");
       if ( ((++bit_cnt) % 4) == 0 ) {
-        std::cout << " ";
+        //std::cout << " ";
       }
     } 
 
