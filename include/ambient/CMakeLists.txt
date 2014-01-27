@@ -22,7 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    pwm_decoder.h
     manchester_decoder.h
     packet_squelch.h DESTINATION include/ambient
 )

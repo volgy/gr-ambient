@@ -24,9 +24,7 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
-
 list(APPEND ambient_sources
-    pwm_decoder_impl.cc
     manchester_decoder_impl.cc
     packet_squelch_impl.cc
 )

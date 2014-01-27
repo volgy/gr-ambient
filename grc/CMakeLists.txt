@@ -16,9 +16,7 @@
 # along with GNU Radio; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
-
 install(FILES
-    ambient_pwm_decoder.xml
     ambient_manchester_decoder.xml
     ambient_packet_squelch.xml DESTINATION share/gnuradio/grc/blocks
 )
