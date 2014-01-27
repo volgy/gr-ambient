@@ -1,9 +1,11 @@
 Manchester encoding ('1': H->L transition)
 Bit time: 1ms
 Each packet (65bits) is repeated 3 times (back-to-back) => 195 bits frame
+Frames are sent about every minute. The exact interval is based on the 
+   channel id: (1:53s, 2:57s, 3:59s, 4:61s, 5:67s, 7:71s, 8:73s).
 
 <R> random id (at reset)
-<C> channel
+<C> channel id 
 <T> temperature: Temp = -40F + <T>/20
 <H> relative humidity: RH = <H>/2
 
