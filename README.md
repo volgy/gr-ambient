@@ -1,4 +1,4 @@
 gr-ambient
 ==========
 
-GnuRadio blocks for receiving reports from Ambient Weather wireless sensors. 
+GNU Radio blocks for receiving reports from Ambient Weather wireless sensors. 
